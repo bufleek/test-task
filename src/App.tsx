@@ -10,7 +10,9 @@ import theme from "./theme";
 
 function App() {
   return (
+    // Provide @mui custom theme
     <ThemeProvider theme={theme}>
+      {/* Provide user context */}
       <UserContextProvider>
         <Container
           sx={{

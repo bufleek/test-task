@@ -8,11 +8,17 @@ import Task from "./task";
 
 export default function UserDetail() {
   const { setUserTasks, getUser } = useUserContext();
+  // get the current userId from the route params
   const { userId } = useParams();
 
   const user = getUser(userId);
   const tasks = user?.tasks ?? [];
 
+  /*
+   * watch for changes in the userId variable
+   * get user tasks on change detection
+   * Run only when users tasks aren't available yet
+   */
   const getUserDetail = useCallback(() => {
     if (userId && user && !user.tasks)
       getTasks(userId).then(({ data }) => {
@@ -20,6 +26,9 @@ export default function UserDetail() {
       });
   }, [userId, user, setUserTasks]);
 
+  /*
+   * Mark the task as completed
+   */
   const onComplete = (task: TaskModel) => {
     if (task.completed) return;
 

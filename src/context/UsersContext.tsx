@@ -3,10 +3,13 @@ import { getUsers } from "../api/users";
 import { Task } from "../models/Task";
 import User from "../models/User";
 
+/*
+ * Maintains the state of the whole app - fetched users and their tasks
+ *Defining initial state
+ */
 const initialValues: InitialValues = {
   users: [],
   getAllUsers: () => Promise.reject([]),
-  loading: false,
   setUserTasks(__, _) {},
   getUser: (_) => undefined,
 };
@@ -14,17 +17,12 @@ export const UserContext = createContext(initialValues);
 
 export function UserContextProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(false);
 
   const getAllUsers = () => {
-    setLoading(true);
-    return getUsers()
-      .then(({ data }) => {
-        setUsers(data);
-        return data;
-      })
-
-      .finally(() => setLoading(false));
+    return getUsers().then(({ data }) => {
+      setUsers(data);
+      return data;
+    });
   };
 
   const setUserTasks = (userId: number, tasks: Task[]) => {
@@ -40,10 +38,11 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
 
   const getUser = (userId: string | undefined) =>
     userId ? users.find((i) => i.id === parseInt(userId)) : undefined;
-
+  /*
+   * Wraps the children in a context provider
+   */
   return (
-    <UserContext.Provider
-      value={{ users, loading, getAllUsers, setUserTasks, getUser }}>
+    <UserContext.Provider value={{ users, getAllUsers, setUserTasks, getUser }}>
       {children}
     </UserContext.Provider>
   );
@@ -51,7 +50,6 @@ export function UserContextProvider({ children }: { children: ReactNode }) {
 
 type InitialValues = {
   users: User[];
-  loading: boolean;
   getAllUsers(): Promise<User[]>;
   setUserTasks(userId: number, tasks: Task[]): void;
   getUser: (userId: string | undefined) => undefined | User;
